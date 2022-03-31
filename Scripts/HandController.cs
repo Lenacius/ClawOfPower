@@ -1,18 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 public class HandController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    // Invoked when a line of data is received from the serial device.
+    void OnMessageArrived(string msg)
     {
-        
+        Debug.Log("Message arrived: " + msg);
     }
 
-    // Update is called once per frame
-    void Update()
+    // Invoked when a connect/disconnect event occurs. The parameter 'success'
+    // will be 'true' upon connection, and 'false' upon disconnection or
+    // failure to connect.
+    void OnConnectionEvent(bool success)
     {
-        
+        if (success)
+            Debug.Log("Connection established");
+        else
+            Debug.Log("Connection attempt failed or disconnection detected");
     }
 }
