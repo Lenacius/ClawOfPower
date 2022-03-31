@@ -15,6 +15,7 @@ public class HandController : MonoBehaviour
     void ProcessMessage(string msg) {
         if (msg != "Failed to find MPU6050 chip" && msg != "MPU6050 Found!")
         {
+            connected = true; // This improve calibration
             string[] components = msg.Split('|');
             if (components[0] == "FNG")
                 ProcessFingers(components);
@@ -33,7 +34,7 @@ public class HandController : MonoBehaviour
     }
 
     // MPU6050 processing
-    Vector3 rawGyro;
+    public Vector3 rawGyro;
     void ProcessMPU(string[] rawValues)
     {
         rawGyro.x = float.Parse(rawValues[1], CultureInfo.InvariantCulture);
@@ -51,5 +52,38 @@ public class HandController : MonoBehaviour
             Debug.Log("Connection established");
         else
             Debug.Log("Connection attempt failed or disconnection detected");
+    }
+
+    private void Update()
+    {
+        if(connected)
+            if (!isCalibrated)
+                Calibrate();
+            else
+                this.transform.Rotate((rawGyro - offGyro) * Time.deltaTime * 50f);
+    }
+
+    // Connection check
+    bool connected = false;
+    // Calibration configuration
+    float calibrationTime = 5.0f;
+    bool isCalibrated = false;
+    int ammountOfValues = 0;
+
+    public Vector3 offGyro;
+
+    void Calibrate()
+    {
+        calibrationTime -= Time.deltaTime;
+        if (calibrationTime > 0)
+        {
+            offGyro += rawGyro;
+            ammountOfValues++;
+        }
+        else
+        {
+            offGyro /= ammountOfValues;
+            isCalibrated = true;
+        }
     }
 }
