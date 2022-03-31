@@ -30,9 +30,13 @@ public class HandController : MonoBehaviour
             fingerBend[x-1] = float.Parse(rawValues[x], CultureInfo.InvariantCulture);
     }
 
+    // MPU6050 processing
+    Vector3 rawGyro;
     void ProcessMPU(string[] rawValues)
     {
-
+        rawGyro.x = float.Parse(rawValues[1], CultureInfo.InvariantCulture);
+        rawGyro.y = float.Parse(rawValues[2], CultureInfo.InvariantCulture);
+        rawGyro.z = float.Parse(rawValues[3], CultureInfo.InvariantCulture);
     }
 
     // Invoked when a connect/disconnect event occurs. The parameter 'success'
