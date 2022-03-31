@@ -23,8 +23,11 @@ public class HandController : MonoBehaviour
         }
     }
 
+    // Finger bend processing
+    float[] fingerBend = { 0, 0, 0, 0, 0 };
     void ProcessFingers(string[] rawValues) { 
-        
+        for(int x = 1; x < 6; x++) // First value is the identifier FNG
+            fingerBend[x-1] = float.Parse(rawValues[x], CultureInfo.InvariantCulture);
     }
 
     void ProcessMPU(string[] rawValues)
