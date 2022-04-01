@@ -25,7 +25,7 @@ public class HandController : MonoBehaviour
     }
 
     // Finger bend processing
-    float[] fingerBend = { 0, 0, 0, 0, 0 };
+    public float[] fingerBend = { 0, 0, 0, 0, 0 };
     void ProcessFingers(string[] rawValues) {
         for (int x = 1; x < 6; x++) { // First value is the identifier FNG
             fingerBend[x - 1] = float.Parse(rawValues[x], CultureInfo.InvariantCulture);
@@ -61,6 +61,28 @@ public class HandController : MonoBehaviour
                 Calibrate();
             else
                 this.transform.Rotate((rawGyro - offGyro) * Time.deltaTime * 50f);
+
+        FingersAnimator();
+    }
+
+    public Animator thumbAnimator;
+    public Animator indexAnimator;
+    public Animator middleAnimator;
+    public Animator ringAnimator;
+    public Animator pinkyAnimator;
+    void FingersAnimator()
+    {
+        thumbAnimator.speed = 0f;
+        indexAnimator.speed = 0f;
+        middleAnimator.speed = 0f;
+        ringAnimator.speed = 0f;
+        pinkyAnimator.speed = 0f;
+
+        thumbAnimator.Play("ThumbFingerAnimation", 0, fingerBend[0] / 100.0f);
+        indexAnimator.Play("IndexFingerAnimation", 0, fingerBend[1] / 100.0f);
+        middleAnimator.Play("MiddleFingerAnimation", 0, fingerBend[2] / 100.0f);
+        ringAnimator.Play("RingFingerAnimation", 0, fingerBend[3] / 100.0f);
+        pinkyAnimator.Play("PinkyFingerAnimation", 0, fingerBend[4] / 100.0f);
     }
 
     // Connection check
