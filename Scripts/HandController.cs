@@ -65,6 +65,7 @@ public class HandController : MonoBehaviour
         FingersAnimator();
     }
 
+    // Animators
     public Animator thumbAnimator;
     public Animator indexAnimator;
     public Animator middleAnimator;
