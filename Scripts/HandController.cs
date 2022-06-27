@@ -2,89 +2,42 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HandController : MonoBehaviour
 {
-    // Invoked when a line of data is received from the serial device.
-    void OnMessageArrived(string msg)
-    {
-        Debug.Log("Message arrived: " + msg);
-        ProcessMessage(msg);
-    }
+    public ArduinoListener ardListener;
 
-    void ProcessMessage(string msg) {
-        if (msg != "Failed to find MPU6050 chip" && msg != "MPU6050 Found!")
-        {
-            connected = true; // This improve calibration
-            string[] components = msg.Split('|');
-            if (components[0] == "FNG")
-                ProcessFingers(components);
-            else if (components[0] == "MPU")
-                ProcessMPU(components);
-        }
-    }
+    public GameObject hand;
 
-    // Finger bend processing
-    public float[] fingerBend = { 0, 0, 0, 0, 0 };
-    void ProcessFingers(string[] rawValues) {
-        for (int x = 1; x < 6; x++) { // First value is the identifier FNG
-            fingerBend[x - 1] = float.Parse(rawValues[x], CultureInfo.InvariantCulture);
-//            Debug.Log("Finger " + x + ':' + fingerBend[x - 1]);
-        }
-    }
-
-    // MPU6050 processing
-    public Vector3 rawGyro;
-    void ProcessMPU(string[] rawValues)
-    {
-        rawGyro.x = float.Parse(rawValues[1], CultureInfo.InvariantCulture);
-        rawGyro.y = float.Parse(rawValues[2], CultureInfo.InvariantCulture);
-        rawGyro.z = float.Parse(rawValues[3], CultureInfo.InvariantCulture);
-//        Debug.Log("Gyroscope values:" + rawGyro.x + '|' + rawGyro.y + '|' + rawGyro.z);
-    }
-
-    // Invoked when a connect/disconnect event occurs. The parameter 'success'
-    // will be 'true' upon connection, and 'false' upon disconnection or
-    // failure to connect.
-    void OnConnectionEvent(bool success)
-    {
-        if (success)
-            Debug.Log("Connection established");
-        else
-            Debug.Log("Connection attempt failed or disconnection detected");
-    }
-
+    //public Vector3 gravity;
+    //public Vector3 res;
+    //public Vector3 resAccel;
+    //public float g = 10.81f;
     private void Update()
     {
-        if(connected)
+        if (connected)
             if (!isCalibrated)
                 Calibrate();
             else
-                this.transform.Rotate((rawGyro - offGyro) * Time.deltaTime * 50f);
+            {
+                this.transform.Rotate((ardListener.rawAccelerometer[0] - offGyro) * Time.deltaTime * 50f);
+                    
+                //this.transform.position += (rawAccelerometer - (this.rawAccelerometer.normalized * g) - offAccel) * Time.deltaTime;]
+                //rawAccelerometer.y = 0;
+                //this.transform.position += (rawAccelerometer) * Time.deltaTime;
+                //at.text = (rawAccelerometer - (this.rawAccelerometer.normalized * g)).ToString();
+                //at.text = (rawAccelerometer).ToString();
+                //gravity = (this.rawAccelerometer.normalized * g);
+                //res = (rawAccelerometer - gravity);
+                //resAccel = res - offAccel;
 
-        FingersAnimator();
+                //ignore gravity
+                //this.transform.position += ((rawAccelerometer.normalized - offAccel.normalized) - Vector3.up) * Time.deltaTime;
+            }
+
     }
 
-    // Animators
-    public Animator thumbAnimator;
-    public Animator indexAnimator;
-    public Animator middleAnimator;
-    public Animator ringAnimator;
-    public Animator pinkyAnimator;
-    void FingersAnimator()
-    {
-        thumbAnimator.speed = 0f;
-        indexAnimator.speed = 0f;
-        middleAnimator.speed = 0f;
-        ringAnimator.speed = 0f;
-        pinkyAnimator.speed = 0f;
-
-        thumbAnimator.Play("ThumbFingerAnimation", 0, fingerBend[0] / 100.0f);
-        indexAnimator.Play("IndexFingerAnimation", 0, fingerBend[1] / 100.0f);
-        middleAnimator.Play("MiddleFingerAnimation", 0, fingerBend[2] / 100.0f);
-        ringAnimator.Play("RingFingerAnimation", 0, fingerBend[3] / 100.0f);
-        pinkyAnimator.Play("PinkyFingerAnimation", 0, fingerBend[4] / 100.0f);
-    }
 
     // Connection check
     bool connected = false;
@@ -94,18 +47,23 @@ public class HandController : MonoBehaviour
     int ammountOfValues = 0;
 
     public Vector3 offGyro;
+    public Vector3 offAccel;
 
     void Calibrate()
     {
         calibrationTime -= Time.deltaTime;
         if (calibrationTime > 0)
         {
-            offGyro += rawGyro;
+            //offGyro += rawGyro[0];
+            //offAccel += rawAccelerometer;
+            //offAccel.y -= 10;
             ammountOfValues++;
         }
         else
         {
             offGyro /= ammountOfValues;
+            //offAccel /= ammountOfValues;
+            //offAccel.y = 0;
             isCalibrated = true;
         }
     }
