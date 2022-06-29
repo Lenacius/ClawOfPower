@@ -9,6 +9,7 @@ public class HandController : MonoBehaviour
     public ArduinoListener ardListener;
 
     public GameObject hand;
+    public GameObject camera;
 
     //public Vector3 gravity;
     //public Vector3 res;
@@ -16,13 +17,15 @@ public class HandController : MonoBehaviour
     //public float g = 10.81f;
     private void Update()
     {
-        if (connected)
+        if(ardListener.conected)
             if (!isCalibrated)
                 Calibrate();
             else
             {
-                this.transform.Rotate((ardListener.rawAccelerometer[0] - offGyro) * Time.deltaTime * 50f);
-                    
+                camera.transform.Rotate((ardListener.rawGyro[0] - offAccel) * Time.deltaTime);
+                this.transform.Rotate(new Vector3(0, ardListener.rawGyro[0].y - offAccel.y, 0) * Time.deltaTime);
+                hand.transform.Rotate((ardListener.rawGyro[1] - offGyroHan) * Time.deltaTime);
+
                 //this.transform.position += (rawAccelerometer - (this.rawAccelerometer.normalized * g) - offAccel) * Time.deltaTime;]
                 //rawAccelerometer.y = 0;
                 //this.transform.position += (rawAccelerometer) * Time.deltaTime;
@@ -38,22 +41,23 @@ public class HandController : MonoBehaviour
 
     }
 
-
-    // Connection check
-    bool connected = false;
     // Calibration configuration
-    float calibrationTime = 5.0f;
-    bool isCalibrated = false;
-    int ammountOfValues = 0;
+    public float calibrationTime = 5.0f;
+    public bool isCalibrated = false;
+    public int ammountOfValues = 0;
 
-    public Vector3 offGyro;
+    public Vector3 offGyroCam;
+    public Vector3 offGyroHan;
     public Vector3 offAccel;
 
     void Calibrate()
     {
+        Debug.Log("Cal");
         calibrationTime -= Time.deltaTime;
         if (calibrationTime > 0)
         {
+            offGyroCam += ardListener.rawGyro[0];
+            offGyroHan += ardListener.rawGyro[1];
             //offGyro += rawGyro[0];
             //offAccel += rawAccelerometer;
             //offAccel.y -= 10;
@@ -61,7 +65,8 @@ public class HandController : MonoBehaviour
         }
         else
         {
-            offGyro /= ammountOfValues;
+            offGyroCam /= ammountOfValues;
+            offGyroHan /= ammountOfValues;
             //offAccel /= ammountOfValues;
             //offAccel.y = 0;
             isCalibrated = true;
