@@ -22,8 +22,8 @@ public class HandController : MonoBehaviour
                 Calibrate();
             else
             {
-                camera.transform.Rotate(new Vector3(ardListener.rawGyro[0].x - offAccel.x, 0, ardListener.rawGyro[0].z - offAccel.z) * Time.deltaTime);
-                this.transform.Rotate(new Vector3(0, ardListener.rawGyro[0].y - offAccel.y, 0) * Time.deltaTime);
+                camera.transform.Rotate(new Vector3(ardListener.rawGyro[0].x - offGyroCam.x, 0, ardListener.rawGyro[0].z - offGyroCam.z) * Time.deltaTime);
+                this.transform.Rotate(new Vector3(0, ardListener.rawGyro[0].y - offGyroCam.y, 0) * Time.deltaTime);
                 hand.transform.Rotate((ardListener.rawGyro[1] - offGyroHan) * Time.deltaTime);
 
                 //this.transform.position += (rawAccelerometer - (this.rawAccelerometer.normalized * g) - offAccel) * Time.deltaTime;]
